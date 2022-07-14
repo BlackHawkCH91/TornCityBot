@@ -1,7 +1,8 @@
 ﻿//Libraries
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using Vosk;
+using System.Speech.Recognition;
+
 
 ChromeOptions options = new ChromeOptions();
 options.AddArgument("--disable-blink-features=AutomationControlled");
