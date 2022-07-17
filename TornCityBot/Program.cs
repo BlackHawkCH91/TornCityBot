@@ -5,16 +5,10 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using System.Speech.Recognition;
 using NAudio.Wave;
+using Windows.Media.SpeechRecognition;
 
 
 string RecognisedText = "test";
-SpeechRec("");
-
-while (true)
-{
-    Console.WriteLine("ree");
-}
-
 
 //Start selenium
 ChromeOptions options = new ChromeOptions();
@@ -59,6 +53,8 @@ using (var client = new System.Net.WebClient())
     client.DownloadFile(audioUrl, "audio.mp3");
 }
 
+RecognisedText = SpeechRec("");
+Console.WriteLine(RecognisedText);
 
 
 
@@ -67,7 +63,7 @@ using (var client = new System.Net.WebClient())
 
 
 
-void SpeechRec(string file)
+string SpeechRec(string file)
 {
     using (Mp3FileReader mp3 = new Mp3FileReader(file + "audio.mp3"))
     {
@@ -78,56 +74,14 @@ void SpeechRec(string file)
     }
 
 
+    #pragma warning restore CS8622
     using (SpeechRecognitionEngine recogniser = new SpeechRecognitionEngine(new System.Globalization.CultureInfo("en-US")))
     {
-        #pragma warning restore CS8622
-        bool completed = false;
         recogniser.LoadGrammar(new DictationGrammar());
 
         recogniser.SetInputToWaveFile(file + "audio.wav");
 
-
-        recogniser.SpeechRecognized += new EventHandler<SpeechRecognizedEventArgs>(recogniser_SpeechRecognized);
-        recogniser.RecognizeCompleted += new EventHandler<RecognizeCompletedEventArgs>(recogniser_RecognisedCompleted);
-
-        //recogniser.SetInputToDefaultAudioDevice();
-
-        recogniser.RecognizeAsync();
-
-        while (completed)
-        {
-            Console.ReadLine();
-        }
+        return recogniser.Recognize().Text;
     }
 
-}
-
-static void recogniser_RecognisedCompleted(object sender, RecognizeCompletedEventArgs e)
-{
-    if (e.Error != null)
-    {
-        Console.WriteLine($"Error encountered {e.Error.GetType().Name}: {e.Error.Message}");
-    }
-
-    if (e.Cancelled)
-    {
-        Console.WriteLine("Operation cancelled");
-    }
-    if (e.InputStreamEnded)
-    {
-        Console.WriteLine("End of stream encountered");
-    }
-} 
-
-
-void recogniser_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
-{
-
-    if (e.Result != null && e.Result.Text != null) 
-    {
-        RecognisedText = e.Result.Text;
-    } else
-    {
-        Console.WriteLine("Text not available");
-    }
 }
