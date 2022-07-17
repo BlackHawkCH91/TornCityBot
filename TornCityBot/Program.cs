@@ -4,11 +4,13 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using NAudio.Wave;
+using System.Diagnostics;
 
 //testing vars
 bool enableSelenium = false;
 
 string RecognisedText = "test";
+SpeechRec("");
 
 if (enableSelenium)
 {
@@ -55,6 +57,8 @@ if (enableSelenium)
         client.DownloadFile(audioUrl, "audio.mp3");
     }
 
+    SpeechRec("");
+
     //id = audio-source
     //title = recaptcha challenge expires in two minutes
 }
@@ -68,6 +72,22 @@ void SpeechRec(string file)
         using (WaveStream pcm = WaveFormatConversionStream.CreatePcmStream(mp3))
         {
             WaveFileWriter.CreateWaveFile(file + "audio.wav", pcm);
+        }
+    }
+
+    ProcessStartInfo start = new ProcessStartInfo();
+    start.FileName = @"C:\Users\chook\AppData\Local\Programs\Python\Python310\python.exe";
+    start.Arguments = String.Format("{0} {1}", "..\\..\\..\\SpeechRecognition.py", "");
+    start.UseShellExecute = false;
+    start.RedirectStandardOutput = true;
+
+    using (Process process = Process.Start(start))
+    {
+        System.Threading.Thread.Sleep(4000);
+        using (StreamReader reader = process.StandardOutput)
+        {
+            string result = reader.ReadToEnd();
+            Console.WriteLine(result);
         }
     }
 }
