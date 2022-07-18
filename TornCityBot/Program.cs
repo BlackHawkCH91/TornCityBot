@@ -18,6 +18,7 @@ if (enableSelenium)
     ChromeOptions options = new ChromeOptions();
     options.AddArgument("--disable-blink-features=AutomationControlled");
     options.AddExcludedArgument("enable-automation");
+    options.AddArgument("--mute-audio");
     string username = "chook";
     string userProfile = "C:/Users/" + username + "/AppData/Local/Google/Chrome/User Data";
     //options.AddArguments("user-data-dir=" + userProfile);
