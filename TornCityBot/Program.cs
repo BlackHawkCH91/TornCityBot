@@ -5,12 +5,13 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using NAudio.Wave;
 using System.Diagnostics;
+using Vosk;
+using System.Text.Json;
 
 //testing vars
 bool enableSelenium = false;
-
 string RecognisedText = "test";
-SpeechRec("");
+Vosk.Vosk.SetLogLevel(-1);
 
 if (enableSelenium)
 {
@@ -25,6 +26,7 @@ if (enableSelenium)
     options.AddArgument("--profile-directory=" + "Profile 2");
 
     IWebDriver driver = new ChromeDriver(@"C:\ChromeDrivers\103\", options);
+    driver.Manage().Window.Maximize();
 
     driver.Navigate().GoToUrl("https://www.google.com/recaptcha/api2/demo");
 
@@ -58,7 +60,7 @@ if (enableSelenium)
         client.DownloadFile(audioUrl, "audio.mp3");
     }
 
-    SpeechRec("");
+    SpeechRec();
 
     //id = audio-source
     //title = recaptcha challenge expires in two minutes
@@ -66,29 +68,51 @@ if (enableSelenium)
 
 
 
-void SpeechRec(string file)
+void SpeechRec()
 {
-    using (Mp3FileReader mp3 = new Mp3FileReader(file + "audio.mp3"))
+    int bitRate;
+    //Convert mp3 to wav
+    using (Mp3FileReader mp3 = new Mp3FileReader("audio.mp3"))
     {
         using (WaveStream pcm = WaveFormatConversionStream.CreatePcmStream(mp3))
         {
-            WaveFileWriter.CreateWaveFile(file + "audio.wav", pcm);
+            WaveFileWriter.CreateWaveFile("audio.wav", pcm);
         }
     }
 
-    ProcessStartInfo start = new ProcessStartInfo();
-    start.FileName = @"C:\Users\chook\AppData\Local\Programs\Python\Python310\python.exe";
-    start.Arguments = String.Format("{0} {1}", "..\\..\\..\\SpeechRecognition.py", "");
-    start.UseShellExecute = false;
-    start.RedirectStandardOutput = true;
-
-    using (Process process = Process.Start(start))
+    //Convert the wav from stereo to mono
+    using (var waveFileReader = new WaveFileReader("audio.wav"))
     {
-        System.Threading.Thread.Sleep(4000);
-        using (StreamReader reader = process.StandardOutput)
+        var outFormat = new WaveFormat(waveFileReader.WaveFormat.SampleRate, 1);
+        using (var resampler = new MediaFoundationResampler(waveFileReader, outFormat))
         {
-            string result = reader.ReadToEnd();
-            Console.WriteLine(result);
+            WaveFileWriter.CreateWaveFile("audio2.wav", resampler);
+        }
+
+        bitRate = waveFileReader.WaveFormat.SampleRate;
+    }
+
+    //Create Vosk STT
+    Model model = new Model("model");
+    VoskRecognizer rec = new VoskRecognizer(model, bitRate);
+    rec.SetMaxAlternatives(0);
+    rec.SetWords(true);
+
+    using (Stream source = File.OpenRead("audio2.wav"))
+    {
+        byte[] buffer = new byte[4096];
+        int bytesRead;
+        while ((bytesRead = source.Read(buffer, 0, buffer.Length)) > 0)
+        {
+            if (rec.AcceptWaveform(buffer, bytesRead))
+            {
+                rec.Result();
+            }
+            else
+            {
+                rec.PartialResult();
+            }
         }
     }
+    Console.WriteLine(rec.FinalResult());
 }

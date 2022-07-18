@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/vosk-model-en-us-0.22-lgraph (1).zip
+/vosk-model-small-en-us-0.15.zip
