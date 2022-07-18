@@ -19,10 +19,11 @@ ChromeOptions options = new ChromeOptions();
 options.AddArgument("--disable-blink-features=AutomationControlled");
 options.AddExcludedArgument("enable-automation");
 options.AddArgument("--mute-audio");
-//string username = "chook";
-//string userProfile = "C:/Users/" + username + "/AppData/Local/Google/Chrome/User Data";
-//options.AddArguments("user-data-dir=" + userProfile);
-options.AddArgument("--profile-directory=" + "Profile 2");
+string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/AppData/Local/Google/Chrome/User Data/Profile 4";
+options.AddArguments("user-data-dir=" + userProfile);
+options.AddArgument("--profile-directory=Default");
+
+Console.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
 
 IWebDriver driver = new ChromeDriver(@"C:\ChromeDrivers\103\", options);
 driver.Manage().Window.Maximize();
@@ -64,12 +65,22 @@ void CaptchaSolver()
         client.DownloadFile(audioUrl, "audio.mp3");
     }
 
-    driver.FindElement(By.Id("audio-response")).SendKeys(SpeechRec());
-    driver.FindElement(By.Id("audio-response")).SendKeys(Keys.Enter);
-    RandomWait(8, 12);
+    string audioResponse = SpeechRec();
+
+    if (string.IsNullOrEmpty(audioResponse) || driver.FindElement(By.ClassName("rc-audiochallenge-error-message")).Displayed)
+    {
+        driver.Navigate().Refresh();
+        CaptchaSolver();
+    } else
+    {
+        driver.FindElement(By.Id("audio-response")).SendKeys(audioResponse);
+        Task.WaitAll();
+        Thread.Sleep(5000);
+        driver.FindElement(By.Id("audio-response")).SendKeys(Keys.Enter);
+    }
 }
 
-
+//rc-audiochallenge-error-message
 
 string SpeechRec()
 {
