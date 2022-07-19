@@ -18,29 +18,14 @@ using System.Net;
 bool enableSelenium = true;
 Vosk.Vosk.SetLogLevel(-1);
 
-ProxyServer proxyServer = new ProxyServer(userTrustRootCertificate: true);
+TornCityBot.Proxy.StartProxy();
 
-var httpProxy = new ExplicitProxyEndPoint(IPAddress.Any, 8080, decryptSsl: true);
-
-proxyServer.AddEndPoint(httpProxy);
-proxyServer.Start();
-//proxyServer.SetAsSystemHttpProxy(httpProxy);
-//proxyServer.SetAsSystemHttpsProxy(httpProxy);
-
-proxyServer.BeforeResponse += OnBeforeResponse;
-
-async Task OnBeforeResponse(object sender, SessionEventArgs ev)
+var seleniumProxy = new OpenQA.Selenium.Proxy 
 {
-    var request = ev.HttpClient.Request;
-    var response = ev.HttpClient.Response;
-
-    var body = await ev.GetResponseBodyAsString();
-    body = body.Replace("<title>Chrome Headless Detection (Round II)</title>", "<title>My Example Domain</title>");
-    ev.SetResponseBodyString(body);
-
-    //if (String.Equals(ev.HttpClient.Request.RequestUri.Host, "www.example.com", StringComparison.OrdinalIgnoreCase)){}
-}
-
+    HttpProxy = "http://localhost:18882",
+    SslProxy = "http://localhost:18882",
+    FtpProxy = "http://localhost:18882"
+};
 
 
 //Start selenium
@@ -51,11 +36,12 @@ options.AddArguments("user-data-dir=" + userProfile);
 options.AddArgument("--profile-directory=Default");
 options.AddArgument("--disable-blink-features=AutomationControlled");
 options.AddArgument("--mute-audio");
-options.AddArgument("--proxy-server=http://localhost:18882");
 //options.AddArgument("headless");
 options.AddArgument("ignore-certificate-errors");
 options.AddArgument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36");
 options.AddExcludedArgument("enable-automation");
+options.Proxy = seleniumProxy;
+
 
 Console.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
 
@@ -84,12 +70,6 @@ if (enableSelenium)
     //CaptchaSolver();
 
 }
-
-static async Task Navigate(IWebDriver driver, string url)
-{
-    
-}
-
 
 void CaptchaSolver()
 {
