@@ -8,7 +8,7 @@ using System.Diagnostics;
 using Vosk;
 using System.Text.Json;
 using Newtonsoft.Json.Linq;
-
+    
 //testing vars
 bool enableSelenium = true;
 Vosk.Vosk.SetLogLevel(-1);
@@ -16,25 +16,46 @@ Vosk.Vosk.SetLogLevel(-1);
 
 //Start selenium
 ChromeOptions options = new ChromeOptions();
-options.AddArgument("--disable-blink-features=AutomationControlled");
-options.AddExcludedArgument("enable-automation");
-options.AddArgument("--mute-audio");
+string chromeTest = "{loadTimes: ƒ, csi: ƒ}app: ObjectInstallState: {DISABLED: 'disabled', INSTALLED: 'installed', NOT_INSTALLED: 'not_installed'}DISABLED: \"disabled\"INSTALLED: \"installed\"NOT_INSTALLED: \"not_installed\"[[Prototype]]: ObjectRunningState: {CANNOT_RUN: 'cannot_run', READY_TO_RUN: 'ready_to_run', RUNNING: 'running'}getDetails: ƒ getDetails()getIsInstalled: ƒ getIsInstalled()installState: ƒ installState()isInstalled: (...)runningState: ƒ runningState()get isInstalled: ƒ ()[[Prototype]]: Objectcsi: ƒ ()arguments: nullcaller: nulllength: 0name: \"\"prototype: {constructor: ƒ}[[FunctionLocation]]: ​[[Prototype]]: ƒ ()[[Scopes]]: Scopes[0]loadTimes: ƒ ()get app: ƒ ()set app: ƒ ()[[Prototype]]: Object";
 string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/AppData/Local/Google/Chrome/User Data/Profile 4";
 options.AddArguments("user-data-dir=" + userProfile);
 options.AddArgument("--profile-directory=Default");
+options.AddArgument("--disable-blink-features=AutomationControlled");
+options.AddArgument("--mute-audio");
+options.AddArgument("headless");
+options.AddArgument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36");
+options.AddExcludedArgument("enable-automation");
 
 Console.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
 
 IWebDriver driver = new ChromeDriver(@"C:\ChromeDrivers\103\", options);
 driver.Manage().Window.Maximize();
 
+IJavaScriptExecutor loadChrome = (IJavaScriptExecutor)driver;
+
+
 if (enableSelenium)
 {
-    
-    driver.Navigate().GoToUrl("https://www.google.com/recaptcha/api2/demo");
-    CaptchaSolver();
+    //driver.Navigate().GoToUrl("https://intoli.com/blog/not-possible-to-block-chrome-headless/chrome-headless-test.html");
+    Navigate(driver, "https://intoli.com/blog/not-possible-to-block-chrome-headless/chrome-headless-test.html");
+
+    string thing = driver.FindElement(By.TagName("table")).GetAttribute("innerHTML");
+    Console.WriteLine(thing);
+    //driver.Navigate().GoToUrl("https://www.torn.com/");
+    //driver.Navigate().GoToUrl("https://www.google.com/search?q=torn+city&sxsrf=ALiCzsZqGtZSjv_wU_hn-WCGoU0qA0KI8g%3A1658213089644&source=hp&ei=4VLWYuSrJIPD4-EP2b-1-Ac&iflsig=AJiK0e8AAAAAYtZg8VBsoiuG5qQNXZqLHl8t6129ARAv&ved=0ahUKEwikoKuRrYT5AhWD4TgGHdlfDX8Q4dUDCAk&uact=5&oq=torn+city&gs_lcp=Cgdnd3Mtd2l6EAMyBAgjECcyBAgjECcyBAgjECcyCwguEIAEELEDEIMBMgUIABCABDIFCAAQgAQyBQgAEIAEMgUIABCABDIFCAAQgAQyBQgAEIAEOgcIIxDqAhAnOgUIABCRAjoRCC4QgAQQsQMQgwEQxwEQ0QM6CwgAEIAEELEDEIMBOgQIABBDOggILhCABBCxAzoKCAAQsQMQgwEQQzoECC4QQzoHCAAQsQMQQzoKCAAQsQMQyQMQQzoLCC4QgAQQsQMQ1AI6BwgAEIAEEAo6CgguELEDEIMBEEM6CAgAEIAEELEDOgUILhCABFCvBFjgEWDrE2gCcAB4AIABmwKIAe4QkgEFMC41LjWYAQCgAQGwAQo&sclient=gws-wiz");
+    //ThreadRandomWait(2, 3);
+    //driver.FindElement(By.TagName("h3")).FindElement(By.XPath("./..")).Click();
+
+    //CaptchaSolver();
 
 }
+
+void Navigate(IWebDriver driver, string url)
+{
+    ((IJavaScriptExecutor)driver).ExecuteScript("window.chrome = {runtime: {}};");
+    driver.Navigate().GoToUrl(url);
+}
+
 
 void CaptchaSolver()
 {
@@ -59,7 +80,7 @@ void CaptchaSolver()
     iFrames = driver.FindElements(By.TagName("iframe")).ToList();
     driver.SwitchTo().Frame(iFrames[iFrames.Count - 1]);
     string audioUrl = driver.FindElement(By.Id("audio-source")).GetAttribute("src");
-    
+
     using (var client = new System.Net.WebClient())
     {
         client.DownloadFile(audioUrl, "audio.mp3");
@@ -67,20 +88,18 @@ void CaptchaSolver()
 
     string audioResponse = SpeechRec();
 
-    if (string.IsNullOrEmpty(audioResponse) || driver.FindElement(By.ClassName("rc-audiochallenge-error-message")).Displayed)
+    if (string.IsNullOrEmpty(audioResponse) || driver.FindElement(By.ClassName("rc-audiochallenge-error-message")).Displayed || audioResponse.Split(" ").Length <= 1)
     {
         driver.Navigate().Refresh();
         CaptchaSolver();
-    } else
+    }
+    else
     {
         driver.FindElement(By.Id("audio-response")).SendKeys(audioResponse);
-        Task.WaitAll();
-        Thread.Sleep(5000);
+        ThreadRandomWait(5, 7);
         driver.FindElement(By.Id("audio-response")).SendKeys(Keys.Enter);
     }
 }
-
-//rc-audiochallenge-error-message
 
 string SpeechRec()
 {
@@ -131,7 +150,12 @@ string SpeechRec()
     return (dynamic)JObject.Parse(rec.FinalResult())["text"];
 }
 
-void RandomWait(int a, int b)
+void ImpRandomWait(int a, int b)
 {
     driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(a + new Random().NextDouble() * 5);
+}
+
+void ThreadRandomWait(int a, int b)
+{
+    Thread.Sleep(Convert.ToInt32((a + new Random().NextDouble() * 5) * 1000));
 }
