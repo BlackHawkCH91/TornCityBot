@@ -9,11 +9,39 @@ using Vosk;
 using System.Text.Json;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
-    
+using Titanium.Web.Proxy;
+using Titanium.Web.Proxy.EventArguments;
+using Titanium.Web.Proxy.Models;
+using System.Net;
+
 //testing vars
 bool enableSelenium = true;
 Vosk.Vosk.SetLogLevel(-1);
-//Console.WriteLine(SpeechRec());
+
+ProxyServer proxyServer = new ProxyServer(userTrustRootCertificate: true);
+
+var httpProxy = new ExplicitProxyEndPoint(IPAddress.Any, 8080, decryptSsl: true);
+
+proxyServer.AddEndPoint(httpProxy);
+proxyServer.Start();
+//proxyServer.SetAsSystemHttpProxy(httpProxy);
+//proxyServer.SetAsSystemHttpsProxy(httpProxy);
+
+proxyServer.BeforeResponse += OnBeforeResponse;
+
+async Task OnBeforeResponse(object sender, SessionEventArgs ev)
+{
+    var request = ev.HttpClient.Request;
+    var response = ev.HttpClient.Response;
+
+    var body = await ev.GetResponseBodyAsString();
+    body = body.Replace("<title>Chrome Headless Detection (Round II)</title>", "<title>My Example Domain</title>");
+    ev.SetResponseBodyString(body);
+
+    //if (String.Equals(ev.HttpClient.Request.RequestUri.Host, "www.example.com", StringComparison.OrdinalIgnoreCase)){}
+}
+
+
 
 //Start selenium
 ChromeOptions options = new ChromeOptions();
@@ -23,7 +51,9 @@ options.AddArguments("user-data-dir=" + userProfile);
 options.AddArgument("--profile-directory=Default");
 options.AddArgument("--disable-blink-features=AutomationControlled");
 options.AddArgument("--mute-audio");
-options.AddArgument("headless");
+options.AddArgument("--proxy-server=http://localhost:18882");
+//options.AddArgument("headless");
+options.AddArgument("ignore-certificate-errors");
 options.AddArgument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36");
 options.AddExcludedArgument("enable-automation");
 
@@ -41,7 +71,6 @@ if (enableSelenium)
     //await Navigate(driver, "");
     //((IJavaScriptExecutor)driver).ExecuteAsyncScript("window.chrome = {runtime: {}};");
     driver.Navigate().GoToUrl("https://intoli.com/blog/not-possible-to-block-chrome-headless/chrome-headless-test.html");
-    ((IJavaScriptExecutor)driver).ExecuteScript("window.chrome = {runtime: {}};");
     /*await Task.Run(() =>
     {
     });*/
