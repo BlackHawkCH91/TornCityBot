@@ -53,21 +53,18 @@ IJavaScriptExecutor loadChrome = (IJavaScriptExecutor)driver;
 
 if (enableSelenium)
 {
+
     //driver.Navigate().GoToUrl("https://intoli.com/blog/not-possible-to-block-chrome-headless/chrome-headless-test.html");
-    //await Navigate(driver, "");
-    //((IJavaScriptExecutor)driver).ExecuteAsyncScript("window.chrome = {runtime: {}};");
-    driver.Navigate().GoToUrl("https://intoli.com/blog/not-possible-to-block-chrome-headless/chrome-headless-test.html");
-    /*await Task.Run(() =>
-    {
-    });*/
-    string thing = driver.FindElement(By.TagName("table")).GetAttribute("innerHTML");
-    Console.WriteLine(thing);
+    driver.Navigate().GoToUrl("http://example.com");
+    //string thing = driver.FindElement(By.TagName("table")).GetAttribute("innerHTML");
+    //Console.WriteLine(thing);
     //driver.Navigate().GoToUrl("https://www.torn.com/");
     //driver.Navigate().GoToUrl("https://www.google.com/search?q=torn+city&sxsrf=ALiCzsZqGtZSjv_wU_hn-WCGoU0qA0KI8g%3A1658213089644&source=hp&ei=4VLWYuSrJIPD4-EP2b-1-Ac&iflsig=AJiK0e8AAAAAYtZg8VBsoiuG5qQNXZqLHl8t6129ARAv&ved=0ahUKEwikoKuRrYT5AhWD4TgGHdlfDX8Q4dUDCAk&uact=5&oq=torn+city&gs_lcp=Cgdnd3Mtd2l6EAMyBAgjECcyBAgjECcyBAgjECcyCwguEIAEELEDEIMBMgUIABCABDIFCAAQgAQyBQgAEIAEMgUIABCABDIFCAAQgAQyBQgAEIAEOgcIIxDqAhAnOgUIABCRAjoRCC4QgAQQsQMQgwEQxwEQ0QM6CwgAEIAEELEDEIMBOgQIABBDOggILhCABBCxAzoKCAAQsQMQgwEQQzoECC4QQzoHCAAQsQMQQzoKCAAQsQMQyQMQQzoLCC4QgAQQsQMQ1AI6BwgAEIAEEAo6CgguELEDEIMBEEM6CAgAEIAEELEDOgUILhCABFCvBFjgEWDrE2gCcAB4AIABmwKIAe4QkgEFMC41LjWYAQCgAQGwAQo&sclient=gws-wiz");
     //ThreadRandomWait(2, 3);
     //driver.FindElement(By.TagName("h3")).FindElement(By.XPath("./..")).Click();
 
     //CaptchaSolver();
+    TornCityBot.Proxy.StopProxy();
 
 }
 
