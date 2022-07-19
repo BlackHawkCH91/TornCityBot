@@ -8,6 +8,7 @@ using System.Diagnostics;
 using Vosk;
 using System.Text.Json;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
     
 //testing vars
 bool enableSelenium = true;
@@ -37,8 +38,13 @@ IJavaScriptExecutor loadChrome = (IJavaScriptExecutor)driver;
 if (enableSelenium)
 {
     //driver.Navigate().GoToUrl("https://intoli.com/blog/not-possible-to-block-chrome-headless/chrome-headless-test.html");
-    Navigate(driver, "https://intoli.com/blog/not-possible-to-block-chrome-headless/chrome-headless-test.html");
-
+    //await Navigate(driver, "");
+    //((IJavaScriptExecutor)driver).ExecuteAsyncScript("window.chrome = {runtime: {}};");
+    driver.Navigate().GoToUrl("https://intoli.com/blog/not-possible-to-block-chrome-headless/chrome-headless-test.html");
+    ((IJavaScriptExecutor)driver).ExecuteScript("window.chrome = {runtime: {}};");
+    /*await Task.Run(() =>
+    {
+    });*/
     string thing = driver.FindElement(By.TagName("table")).GetAttribute("innerHTML");
     Console.WriteLine(thing);
     //driver.Navigate().GoToUrl("https://www.torn.com/");
@@ -50,10 +56,9 @@ if (enableSelenium)
 
 }
 
-void Navigate(IWebDriver driver, string url)
+static async Task Navigate(IWebDriver driver, string url)
 {
-    ((IJavaScriptExecutor)driver).ExecuteScript("window.chrome = {runtime: {}};");
-    driver.Navigate().GoToUrl(url);
+    
 }
 
 
