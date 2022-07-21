@@ -43,7 +43,17 @@ var loadScript = @"window.chrome = " + chromeTest + @";
                     );
                     Object.defineProperty(navigator, 'plugins', {
                         get: () => [1, 2, 3, 4, 5],
-                    });";
+                    });
+                    const getParameter = WebGLRenderingContext.getParameter;
+                    WebGLRenderingContext.prototype.getParameter = function(parameter) {
+                        if (parameter === 37445) {
+                            return 'Google Inc. (Intel)';
+                        }
+                        if (parameter === 37446) {
+                            return 'ANGLE (Intel, Intel(R) UHD Graphics Direct3D11 vs_5_0 ps_5_0, D3D11)';
+                        }
+                        return getParameter(parameter);
+                    };";
 
 var initialScript = @"Object.defineProperty(Notification, 'permission', {
                         get: function () { return ''; }
@@ -77,6 +87,7 @@ IJavaScriptExecutor loadChrome = (IJavaScriptExecutor)driver;
 if (enableSelenium)
 {
     driver.Navigate().GoToUrl("https://intoli.com/blog/not-possible-to-block-chrome-headless/chrome-headless-test.html");
+    //driver.Navigate().GoToUrl("https://intoli.com/blog/making-chrome-headless-undetectable/chrome-headless-test.html");
     //((IJavaScriptExecutor)driver).ExecuteScript("window, 'chrome' = {runtime: {}};");
     string thing = driver.FindElement(By.TagName("table")).GetAttribute("innerHTML");
     Console.WriteLine(thing);
