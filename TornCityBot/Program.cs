@@ -96,7 +96,8 @@ IJavaScriptExecutor loadChrome = (IJavaScriptExecutor)driver;
 //Console.WriteLine(thing);
 
 LogIn("christian.hensman1@gmail.com", "romeo007");
-GymTrain("strength", 200);
+//GymTrain("strength", 200);
+Crimes("Grand Theft Auto", "Steal a Parked Car", 46);
 
 //CaptchaSolver();
 
@@ -155,7 +156,7 @@ void GymTrain(string stat, int amount)
     ThreadRandomWait(1, 1.5);
 }
 
-void Crimes(string crime)
+void Crimes(string crime, string type, int nerve)
 {
     if (driver.Url != "https://www.torn.com/crimes.php#/step=main")
     {
@@ -176,8 +177,21 @@ void Crimes(string crime)
         }
         catch (Exception ex) { Console.WriteLine(ex.Message);  }
     }
+    //List<IWebElement> crimes = driver.FindElement(By.XPath("//form[@name='crimes']")).FindElements(By.ClassName("bonus")).ToList();
+    ThreadRandomWait(1, 1.5);
+    driver.FindElement(By.XPath("//form[@name='crimes']")).FindElement(By.XPath($"//li[normalize-space() = '{crime}']")).FindElement(By.XPath("..//..")).Click();
 
-    List<IWebElement> crimes = driver.FindElement(By.XPath("//form[@name='crimes']")).FindElements(By.ClassName("bonus")).ToList();
+    double commitAmount = nerve / (crimeList.Keys.ToList().IndexOf(crime) + 3);
+    int amount = (int) Math.Floor(commitAmount);
+
+    ThreadRandomWait(1, 1.5);
+    driver.FindElement(By.XPath("//form[@name='crimes']")).FindElement(By.XPath($"//li[normalize-space() = '{type}']")).FindElement(By.XPath("..//..")).Click();
+
+    for (int i = 0; i < amount; i++)
+    {
+        ThreadRandomWait(0.5, 0.65);
+        driver.FindElement(By.XPath("//button[normalize-space() = 'TRY AGAIN']")).Click();
+    }
 }
 
 
