@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
     
 //testing vars
-bool headless = false;
+bool headless = true;
 Vosk.Vosk.SetLogLevel(-1);
 //Console.WriteLine(SpeechRec());
 
