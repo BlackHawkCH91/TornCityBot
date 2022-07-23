@@ -6,14 +6,35 @@ using OpenQA.Selenium.Support.UI;
 using OpenQA.Selenium.DevTools;
 using NAudio.Wave;
 using System.Diagnostics;
+using System.Linq;
 using Vosk;
 using System.Text.Json;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
     
 //testing vars
-bool headless = true;
+bool headless = false;
 Vosk.Vosk.SetLogLevel(-1);
+
+Dictionary<string, string[]> crimeList = new Dictionary<string, string[]>();
+crimeList.Add("Search for Cash", new string[] { "Search the Train Station", "Search Under the Old Bridge", "Search the Bins", "Search the Water Fountain", "Search the Dumpsters", "Search the Movie Theater" });
+crimeList.Add("Sell Copied Media", new string[] { "Rock CDs", "Heavy Metal CDs", "Pop CDs", "Rap CDs", "Reggae CDs", "Horror DVDs", "Action DVDs", "Romance DVDs", "Sci Fi DVDs", "Thriller DVDs" });
+crimeList.Add("Shoplift", new string[] { "Sweet Shop", "Market Stall", "Clothes Shop", "Jewelry Shop" });
+crimeList.Add("Pickpocket Someone", new string[] { "Hobo", "Kid", "Old Woman", "Businessman", "Lawyer" });
+crimeList.Add("Larceny", new string[] { "Apartment", "Detached House", "Mansion", "Cars", "Office" });
+crimeList.Add("Armed Robberies", new string[] { "Swift Robbery", "Thorough Robbery", "Swift Convenience", "Thorough Convenience", "Swift Bank", "Thorough Bank", "Swift Armored Car", "Thorough Armored Car" });
+crimeList.Add("Transport Drugs", new string[] { "Transport Cannabis", "Transport Amphetamines", "Transport Cocaine", "Sell Cannabis", "Sell Pills", "Sell Cocaine" });
+crimeList.Add("Plant a Computer Virus", new string[] { "Simple Virus", "Polymorphic Virus", "Tunneling Virus", "Armored Virus", "Stealth Virus" });
+crimeList.Add("Assassination", new string[] { "Assassinate a Target", "Drive-by Shooting", "Car Bomb", "Mob Boss" });
+crimeList.Add("Arson", new string[] { "Home", "Car Lot", "Office Building", "Apartment Building", "Warehouse", "Motel", "Government Building" });
+crimeList.Add("Grand Theft Auto", new string[] { "Steal a Parked Car", "Hijack a Car", "Steal Car from Showroom" });
+crimeList.Add("Pawn Shop", new string[] { "Side Door", "Rear Door" });
+crimeList.Add("Counterfeiting", new string[] { "Money", "Casino Tokens", "Credit Card" });
+crimeList.Add("Kidnapping", new string[] { "Kid", "Woman", "Undercover Cop", "Mayor" });
+crimeList.Add("Arms Trafficking", new string[] { "Explosives", "Firearms" });
+crimeList.Add("Bombings", new string[] { "Bomb a Factory", "Bomb a Government Building" });
+crimeList.Add("Hacking", new string[] { "Hack into a Bank Mainframe", "Hack the F.B.I Mainframe" });
+
 //Console.WriteLine(SpeechRec());
 
 //Start selenium
@@ -83,6 +104,7 @@ Console.ReadLine();
 
 void LogIn(string username, string password)
 {
+    Console.WriteLine("Logging in");
     //Bypasses browser check
     DriverNavigate("https://www.torn.com/2644601");
     ThreadRandomWait(2, 3);
@@ -99,6 +121,7 @@ void LogIn(string username, string password)
 
 void GymTrain(string stat, int amount)
 {
+    Console.WriteLine($"Training {amount} {stat}");
     //Check if user is already in gym
     if (driver.Url != "https://www.torn.com/gym.php")
     {
@@ -117,7 +140,7 @@ void GymTrain(string stat, int amount)
             driver.FindElement(By.XPath("//input[@name='reCaptcha']")).Click();
             ThreadRandomWait(1, 1.5);
         } 
-        catch (Exception ex) { }
+        catch (Exception ex) { Console.WriteLine(ex.Message); }
     }
 
     List<IWebElement> ul = driver.FindElements(By.TagName("ul")).ToList();
@@ -132,19 +155,46 @@ void GymTrain(string stat, int amount)
     ThreadRandomWait(1, 1.5);
 }
 
+void Crimes(string crime)
+{
+    if (driver.Url != "https://www.torn.com/crimes.php#/step=main")
+    {
+        wait.Until(d => d.FindElement(By.CssSelector("a[href*='/crimes.php#/step=main']")));
+        ThreadRandomWait(1, 2);
+        driver.FindElement(By.CssSelector("a[href*='/crimes.php#/step=main']")).Click();
+        ThreadRandomWait(1, 1.5);
+
+        //Complete captcha if there is one
+        try
+        {
+            driver.FindElement(By.Id("ui-id-3")).Click();
+            ThreadRandomWait(1, 1.5);
+            CaptchaSolver();
+            ThreadRandomWait(1, 1.5);
+            driver.FindElement(By.XPath("//input[@name='reCaptcha']")).Click();
+            ThreadRandomWait(1, 1.5);
+        }
+        catch (Exception ex) { Console.WriteLine(ex.Message);  }
+    }
+
+    List<IWebElement> crimes = driver.FindElement(By.XPath("//form[@name='crimes']")).FindElements(By.ClassName("bonus")).ToList();
+}
+
+
 
 void DriverNavigate(string url)
 {
+    Console.WriteLine($"Navigating to {url}");
     try
     {
         driver.Navigate().GoToUrl(url);
     }
-    catch (Exception ex) { }
+    catch (Exception ex) { Console.WriteLine(ex.Message);  }
 }
-
 
 void CaptchaSolver()
 {
+    Console.WriteLine($"Solving captcha");
     driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(3);
     List<IWebElement> iFrames = driver.FindElements(By.TagName("iframe")).ToList();
 
@@ -173,14 +223,17 @@ void CaptchaSolver()
     }
 
     string audioResponse = SpeechRec();
+    Console.WriteLine($"Speech Rec: {audioResponse}");
 
     if (string.IsNullOrEmpty(audioResponse) || driver.FindElement(By.ClassName("rc-audiochallenge-error-message")).Displayed || audioResponse.Split(" ").Length <= 1)
     {
+        Console.WriteLine($"Speech Rec: Failed, retrying");
         driver.Navigate().Refresh();
         CaptchaSolver();
     }
     else
     {
+        Console.WriteLine($"SpeechRec: Successful");
         driver.FindElement(By.Id("audio-response")).SendKeys(audioResponse);
         ThreadRandomWait(5, 7);
         driver.FindElement(By.Id("audio-response")).SendKeys(Keys.Enter);
