@@ -17,6 +17,16 @@ using TornActions = TornCityBot.TornActions;
 bool headless = false;
 Vosk.Vosk.SetLogLevel(-1);
 
+//icon15-sidebar <- hospital
+//Getting info:
+
+/*
+ToolTipPortal
+    Div
+        Div[2] (second div)
+            p[2] (second para)
+
+*/
 
 //Console.WriteLine(SpeechRec());
 
@@ -81,9 +91,10 @@ TornActions.Init(driver, wait);
 //Console.WriteLine(thing);
 
 TornActions.LogIn("christian.hensman1@gmail.com", "romeo007");
-TornActions.GymTrain("strength", 200);
-TornActions.Crimes("Grand Theft Auto", "Steal a Parked Car", 46);
-TornActions.Fly("Test", "test");
+//TornActions.GymTrain("strength", 200);
+//TornActions.Crimes("Grand Theft Auto", "Steal a Parked Car", 46);
+//TornActions.Fly("airstrip", "china");
+TornActions.BuyAbroad("Panda Plushie", 28);
 
 //CaptchaSolver();
 

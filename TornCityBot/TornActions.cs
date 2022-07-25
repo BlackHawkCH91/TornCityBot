@@ -81,6 +81,37 @@ namespace TornCityBot
             map.FindElement(By.ClassName("torn-btn")).Click();
             ThreadRandomWait(0.7, 1);
             map.FindElements(By.ClassName("torn-btn"))[1].Click();
+            //countrTravel
+        }
+
+        public static void BuyAbroad(string item, int amount)
+        {
+            //Complete captcha if there is one
+            try
+            {
+                driver.FindElement(By.Id("ui-id-3")).Click();
+                ThreadRandomWait(1, 1.5);
+                CaptchaSolver();
+                ThreadRandomWait(1, 1.5);
+                driver.FindElement(By.XPath("//input[@name='reCaptcha']")).Click();
+                ThreadRandomWait(1, 1.5);
+            }
+            catch (Exception ex) { Console.WriteLine(ex.Message); }
+
+            IWebElement shop = driver.FindElement(By.CssSelector("ul[role*='tablist']"));
+            IWebElement child = driver.FindElement(By.XPath($"(//*[contains(., '{item}')])"));
+            IWebElement buyAmount = child.FindElement(By.ClassName("deal"));
+
+            buyAmount.FindElement(By.TagName("input")).SendKeys(Keys.Control + "a");
+            buyAmount.FindElement(By.TagName("input")).SendKeys(amount.ToString());
+            ThreadRandomWait(1, 1.5);
+            buyAmount.FindElement(By.TagName("a")).Click();
+            ThreadRandomWait(1, 1.5);
+            buyAmount.FindElement(By.XPath("//button[. = 'BUY']")).Click();
+            ThreadRandomWait(1, 1.5);
+            driver.FindElement(By.ClassName("travel-home")).Click();
+            ThreadRandomWait(1, 1.5);
+            driver.FindElement(By.XPath("//button[. = 'TRAVEL BACK']")).Click();
         }
 
         public static void LogIn(string username, string password)
