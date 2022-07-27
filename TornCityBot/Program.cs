@@ -94,7 +94,7 @@ TornActions.Init(driver, wait);
 //TornActions.GymTrain("defense", 200);
 //TornActions.Crimes("Grand Theft Auto", "Steal a Parked Car", 46);
 //TornActions.Fly("airstrip", "china");
-TornActions.BuyAbroad("Peony", 28);
+TornActions.BuyAbroad("Panda Plushie", 28);
 
 //CaptchaSolver();
 

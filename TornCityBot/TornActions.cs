@@ -114,7 +114,9 @@ namespace TornCityBot
             {
                 try
                 {
-                    child = driver.FindElement(By.XPath($"(//*[contains(., '{item}')])"));
+                    //aria-label="Buy: {item}"
+                    //child = driver.FindElement(By.XPath($"(//*[contains(., '{item}')])"));
+                    child = driver.FindElement(By.CssSelector($"a[aria-label*='Buy: {item}']"));
                     itemExists = true;
                 } catch {
                     DriverNavigate("https://www.google.com");
@@ -123,13 +125,15 @@ namespace TornCityBot
                 }
             }
 
-            IWebElement buyAmount = child.FindElement(By.ClassName("deal"));
+            //IWebElement buyAmount = child.FindElement(By.ClassName("deal"));
+            IWebElement buyAmount = child.FindElement(By.XPath(".."));
 
             buyAmount.FindElement(By.TagName("input")).SendKeys(Keys.Control + "a");
             buyAmount.FindElement(By.TagName("input")).SendKeys(amount.ToString());
             ThreadRandomWait(1, 1.5);
             buyAmount.FindElement(By.TagName("a")).Click();
             ThreadRandomWait(1, 1.5);
+
             buyAmount.FindElement(By.XPath("//button[. = 'BUY']")).Click();
             ThreadRandomWait(1, 1.5);
             driver.FindElement(By.ClassName("travel-home")).Click();
