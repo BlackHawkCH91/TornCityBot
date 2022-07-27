@@ -29,6 +29,7 @@ namespace TornCityBot
             driver = _driver ?? throw new ArgumentNullException(nameof(driver));
             wait = _wait ?? throw new ArgumentNullException(nameof(wait));
 
+            //Sorry for spaghet. Complete list of all crimes for future gui.
             crimeList.Add("Search for Cash", new string[] { "Search the Train Station", "Search Under the Old Bridge", "Search the Bins", "Search the Water Fountain", "Search the Dumpsters", "Search the Movie Theater" });
             crimeList.Add("Sell Copied Media", new string[] { "Rock CDs", "Heavy Metal CDs", "Pop CDs", "Rap CDs", "Reggae CDs", "Horror DVDs", "Action DVDs", "Romance DVDs", "Sci Fi DVDs", "Thriller DVDs" });
             crimeList.Add("Shoplift", new string[] { "Sweet Shop", "Market Stall", "Clothes Shop", "Jewelry Shop" });
@@ -48,8 +49,34 @@ namespace TornCityBot
             crimeList.Add("Hacking", new string[] { "Hack into a Bank Mainframe", "Hack the F.B.I Mainframe" });
         }
 
+        //General purpose func to auto wait for element to exist before clicking/sending keys.
+        public static void WebElementInput(By findElement, string? input = null, Action? threadRandomWait = null, bool dontClear = false)
+        {
+            wait.Until(ExpectedConditions.ElementExists(findElement));
+            IWebElement element = driver.FindElement(findElement);
+
+            if (String.IsNullOrEmpty(input))
+            {
+                element.Click();
+            } else
+            {
+                if (!dontClear)
+                {
+                    element.SendKeys(Keys.Control + "a");
+                }
+                element.SendKeys(input);
+            }
+
+            if (threadRandomWait != null)
+            {
+                threadRandomWait();
+            }
+        }
+
         public static void Fly(string plane, string city)
         {
+            //WebElementInput(By.CssSelector("a[href*='/city.php']"), null, () => ThreadRandomWait(1, 2));
+            //Apparent if class 't-red' is greater than 11, OC is about to start
             if (driver.Url != "https://www.torn.com/city.php")
             {
                 wait.Until(ExpectedConditions.ElementExists(By.CssSelector("a[href*='/city.php']")));
