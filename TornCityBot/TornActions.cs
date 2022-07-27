@@ -52,7 +52,7 @@ namespace TornCityBot
         {
             if (driver.Url != "https://www.torn.com/city.php")
             {
-                wait.Until(d => d.FindElement(By.CssSelector("a[href*='/city.php']")));
+                wait.Until(ExpectedConditions.ElementExists(By.CssSelector("a[href*='/city.php']")));
                 ThreadRandomWait(1, 2);
                 driver.FindElement(By.CssSelector("a[href*='/city.php']")).Click();
                 ThreadRandomWait(1, 1.5);
@@ -72,7 +72,7 @@ namespace TornCityBot
                 catch (Exception ex) { Console.WriteLine(ex.Message); }
             }
 
-            wait.Until(d => d.FindElement(By.ClassName("travel-agency")));
+            wait.Until(ExpectedConditions.ElementExists(By.ClassName("travel-agency")));
             ThreadRandomWait(1, 1.5);
             driver.FindElement(By.ClassName(plane)).Click();
             ThreadRandomWait(0.5, 0.75);
@@ -84,7 +84,7 @@ namespace TornCityBot
             map.FindElements(By.ClassName("torn-btn"))[1].Click();
             ThreadRandomWait(0.7, 1);
             map.FindElements(By.ClassName("torn-btn"))[1].Click();
-            wait.Until(d => d.FindElement(By.Id("countrTravel")));
+            wait.Until(ExpectedConditions.ElementExists(By.Id("countrTravel")));
             string travelTime = driver.FindElement(By.Id("countrTravel")).Text;
             DriverNavigate("https://www.google.com");
             Thread.Sleep(TimeSpan.Parse(travelTime) + TimeSpan.FromMinutes(1));
@@ -136,7 +136,7 @@ namespace TornCityBot
             ThreadRandomWait(1, 1.5);
             driver.FindElement(By.XPath("//button[. = 'TRAVEL BACK']")).Click();
             Thread.Sleep(10000);
-            wait.Until(d => d.FindElement(By.Id("countrTravel")));
+            wait.Until(ExpectedConditions.ElementExists(By.Id("countrTravel")));
             string time = driver.FindElement(By.Id("countrTravel")).Text;
             Console.WriteLine(time);
             DriverNavigate("https://www.google.com");
@@ -167,7 +167,7 @@ namespace TornCityBot
             //Check if user is already in gym
             if (driver.Url != "https://www.torn.com/gym.php")
             {
-                wait.Until(d => d.FindElement(By.CssSelector("a[href*='/gym.php']")));
+                wait.Until(ExpectedConditions.ElementExists(By.CssSelector("a[href*='/gym.php']")));
                 ThreadRandomWait(1, 2);
                 driver.FindElement(By.CssSelector("a[href*='/gym.php']")).Click();
                 ThreadRandomWait(1, 1.5);
@@ -201,7 +201,7 @@ namespace TornCityBot
         {
             if (driver.Url != "https://www.torn.com/crimes.php#/step=main")
             {
-                wait.Until(d => d.FindElement(By.CssSelector("a[href*='/crimes.php#/step=main']")));
+                wait.Until(ExpectedConditions.ElementExists(By.CssSelector("a[href*='/crimes.php#/step=main']")));
                 ThreadRandomWait(1, 2);
                 driver.FindElement(By.CssSelector("a[href*='/crimes.php#/step=main']")).Click();
                 ThreadRandomWait(1, 1.5);
@@ -230,7 +230,7 @@ namespace TornCityBot
 
             for (int i = 0; i < amount; i++)
             {
-                wait.Until(d => d.FindElement(By.XPath("//button[normalize-space() = 'TRY AGAIN']")));
+                wait.Until(ExpectedConditions.ElementExists(By.XPath("//button[normalize-space() = 'TRY AGAIN']")));
                 ThreadRandomWait(0.5, 0.65);
                 driver.FindElement(By.XPath("//button[normalize-space() = 'TRY AGAIN']")).Click();
             }
