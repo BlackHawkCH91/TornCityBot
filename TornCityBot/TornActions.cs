@@ -14,6 +14,7 @@ using Vosk;
 using System.Text.Json;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
+using SeleniumExtras.WaitHelpers;
 
 namespace TornCityBot
 {
@@ -81,11 +82,18 @@ namespace TornCityBot
             map.FindElement(By.ClassName("torn-btn")).Click();
             ThreadRandomWait(0.7, 1);
             map.FindElements(By.ClassName("torn-btn"))[1].Click();
+            ThreadRandomWait(0.7, 1);
+            map.FindElements(By.ClassName("torn-btn"))[1].Click();
+            wait.Until(d => d.FindElement(By.Id("countrTravel")));
+            string travelTime = driver.FindElement(By.Id("countrTravel")).Text;
+            DriverNavigate("https://www.google.com");
+            Thread.Sleep(TimeSpan.Parse(travelTime) + TimeSpan.FromMinutes(1));
             //countrTravel
         }
 
         public static void BuyAbroad(string item, int amount)
         {
+            LogIn("christian.hensman1@gmail.com", "romeo007");
             //Complete captcha if there is one
             try
             {
@@ -99,7 +107,22 @@ namespace TornCityBot
             catch (Exception ex) { Console.WriteLine(ex.Message); }
 
             IWebElement shop = driver.FindElement(By.CssSelector("ul[role*='tablist']"));
-            IWebElement child = driver.FindElement(By.XPath($"(//*[contains(., '{item}')])"));
+            bool itemExists = false;
+            IWebElement child = null;
+
+            while (!itemExists)
+            {
+                try
+                {
+                    child = driver.FindElement(By.XPath($"(//*[contains(., '{item}')])"));
+                    itemExists = true;
+                } catch {
+                    DriverNavigate("https://www.google.com");
+                    Thread.Sleep(900000);
+                    LogIn("christian.hensman1@gmail.com", "romeo007");
+                }
+            }
+
             IWebElement buyAmount = child.FindElement(By.ClassName("deal"));
 
             buyAmount.FindElement(By.TagName("input")).SendKeys(Keys.Control + "a");
@@ -112,6 +135,13 @@ namespace TornCityBot
             driver.FindElement(By.ClassName("travel-home")).Click();
             ThreadRandomWait(1, 1.5);
             driver.FindElement(By.XPath("//button[. = 'TRAVEL BACK']")).Click();
+            Thread.Sleep(10000);
+            wait.Until(d => d.FindElement(By.Id("countrTravel")));
+            string time = driver.FindElement(By.Id("countrTravel")).Text;
+            Console.WriteLine(time);
+            DriverNavigate("https://www.google.com");
+            Thread.Sleep(TimeSpan.Parse(time));
+            Console.WriteLine(TimeSpan.Parse(time).TotalSeconds);
         }
 
         public static void LogIn(string username, string password)
@@ -200,6 +230,7 @@ namespace TornCityBot
 
             for (int i = 0; i < amount; i++)
             {
+                wait.Until(d => d.FindElement(By.XPath("//button[normalize-space() = 'TRY AGAIN']")));
                 ThreadRandomWait(0.5, 0.65);
                 driver.FindElement(By.XPath("//button[normalize-space() = 'TRY AGAIN']")).Click();
             }
