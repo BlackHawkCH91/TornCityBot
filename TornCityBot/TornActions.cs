@@ -24,6 +24,7 @@ namespace TornCityBot
         static ChromeDriver driver;
         static WebDriverWait wait;
         
+        //Setup chromedriver and the wait
         public static void Init(ChromeDriver _driver, WebDriverWait _wait)
         {
             driver = _driver ?? throw new ArgumentNullException(nameof(driver));
@@ -52,13 +53,15 @@ namespace TornCityBot
         //General purpose func to auto wait for element to exist before clicking/sending keys.
         public static void WebElementInput(By findElement, IWebElement? parent = null, string? input = null, Action? threadRandomWait = null, bool dontClear = false)
         {
-            wait.Until(ExpectedConditions.ElementExists(findElement));
+            //Wait till element exists
             IWebElement element;
             
             if (parent == null) {
+                wait.Until(ExpectedConditions.ElementExists(findElement));
                 element = driver.FindElement(findElement);
             } else
             {
+                wait.Until(ExpectedConditions.ElementExists(findElement));
                 element = parent.FindElement(findElement);
             }
 
@@ -82,15 +85,19 @@ namespace TornCityBot
 
         public static void CheckForCaptcha()
         {
+            bool complete = false;
             //Complete captcha if there is one
             try
             {
-                Thread.Sleep(7);
-                driver.FindElement(By.Id("ui-id-3")).Click();
-                ThreadRandomWait(1, 1.5);
-                CaptchaSolver();
-                ThreadRandomWait(1, 1.5);
-                WebElementInput(By.XPath("//input[@name='reCaptcha']"), null, null, () => ThreadRandomWait(1, 1.5));
+                while (!complete)
+                {
+                    //driver.FindElement(By.Id("ui-id-3")).Click();
+                    WebElementInput(By.Id("ui-id-3"), null, null, () => ThreadRandomWait(1, 1.5));
+                    ThreadRandomWait(1, 1.5);
+                    CaptchaSolver(ref complete);
+                    ThreadRandomWait(1, 1.5);
+                    WebElementInput(By.XPath("//input[@name='reCaptcha']"), null, null, () => ThreadRandomWait(1, 1.5));
+                }
             }
             catch (Exception ex) { Console.WriteLine(ex.Message); }
         }
@@ -110,6 +117,10 @@ namespace TornCityBot
 
                 CheckForCaptcha();
             }
+
+            //item cap
+            //delimiter[1]
+            //span[2] / span[3]
 
             wait.Until(ExpectedConditions.ElementExists(By.ClassName("travel-agency")));
             ThreadRandomWait(1, 1.5);
@@ -256,7 +267,7 @@ namespace TornCityBot
             catch (Exception ex) { Console.WriteLine(ex.Message); }
         }
 
-        public static void CaptchaSolver()
+        public static void CaptchaSolver(ref bool complete)
         {
             Console.WriteLine($"Solving captcha");
             driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(3);
@@ -293,13 +304,14 @@ namespace TornCityBot
             {
                 Console.WriteLine($"Speech Rec: Failed, retrying");
                 driver.Navigate().Refresh();
-                CaptchaSolver();
+                //CaptchaSolver();
             }
             else
             {
                 Console.WriteLine($"SpeechRec: Successful");
                 WebElementInput(By.Id("audio-response"), null, audioResponse, () => ThreadRandomWait(5, 7));
                 driver.FindElement(By.Id("audio-response")).SendKeys(Keys.Enter);
+                complete = true;
             }
             driver.SwitchTo().DefaultContent();
         }

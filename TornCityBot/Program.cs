@@ -90,10 +90,10 @@ TornActions.Init(driver, wait);
 //string thing = driver.FindElement(By.TagName("table")).GetAttribute("innerHTML");
 //Console.WriteLine(thing);
 
-TornActions.LogIn("christian.hensman1@gmail.com", "romeo007");
+//TornActions.LogIn("christian.hensman1@gmail.com", "romeo007");
 //TornActions.GymTrain("defense", 200);
 //TornActions.Crimes("Grand Theft Auto", "Steal a Parked Car", 46);
-TornActions.Fly("airstrip", "china");
+//TornActions.Fly("airstrip", "china");
 TornActions.BuyAbroad("Panda Plushie", 44);
 
 //CaptchaSolver();
