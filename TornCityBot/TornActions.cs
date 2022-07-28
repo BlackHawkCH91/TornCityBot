@@ -91,10 +91,15 @@ namespace TornCityBot
             {
                 while (!complete)
                 {
-                    //driver.FindElement(By.Id("ui-id-3")).Click();
-                    WebElementInput(By.Id("ui-id-3"), null, null, () => ThreadRandomWait(1, 1.5));
+                    //WebElementInput(By.Id("ui-id-3"), null, null, () => ThreadRandomWait(1, 1.5));
+                    driver.FindElement(By.Id("ui-id-3")).Click();
                     ThreadRandomWait(1, 1.5);
                     CaptchaSolver(ref complete);
+                    if (!complete)
+                    {
+                        continue;
+                    }
+
                     ThreadRandomWait(1, 1.5);
                     WebElementInput(By.XPath("//input[@name='reCaptcha']"), null, null, () => ThreadRandomWait(1, 1.5));
                 }
@@ -135,7 +140,7 @@ namespace TornCityBot
             ThreadRandomWait(0.7, 1);
             map.FindElements(By.ClassName("torn-btn"))[1].Click();
             wait.Until(ExpectedConditions.ElementExists(By.Id("countrTravel")));
-            Thread.Sleep(1000);
+            Thread.Sleep(10000);
             string travelTime = driver.FindElement(By.Id("countrTravel")).Text;
             DriverNavigate("https://www.google.com");
             Thread.Sleep(TimeSpan.Parse(travelTime) + TimeSpan.FromMinutes(1));
@@ -176,8 +181,10 @@ namespace TornCityBot
             buyAmount.FindElement(By.TagName("a")).Click();
             ThreadRandomWait(1, 1.5);
 
-            buyAmount.FindElement(By.XPath("//button[. = 'BUY']")).Click();
-            ThreadRandomWait(1, 1.5);
+            //wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//button[. = 'BUY']")));
+            //buyAmount.FindElement(By.XPath("//button[. = 'BUY']")).Click();
+            driver.FindElement(By.ClassName("expanded")).FindElement(By.ClassName("torn-btn")).Click();
+            ThreadRandomWait(3, 4);
             driver.FindElement(By.ClassName("travel-home")).Click();
             ThreadRandomWait(1, 1.5);
             driver.FindElement(By.XPath("//button[. = 'TRAVEL BACK']")).Click();
