@@ -85,12 +85,12 @@ namespace TornCityBot
             //Complete captcha if there is one
             try
             {
+                Thread.Sleep(7);
                 driver.FindElement(By.Id("ui-id-3")).Click();
                 ThreadRandomWait(1, 1.5);
                 CaptchaSolver();
                 ThreadRandomWait(1, 1.5);
-                driver.FindElement(By.XPath("//input[@name='reCaptcha']")).Click();
-                ThreadRandomWait(1, 1.5);
+                WebElementInput(By.XPath("//input[@name='reCaptcha']"), null, null, () => ThreadRandomWait(1, 1.5));
             }
             catch (Exception ex) { Console.WriteLine(ex.Message); }
         }
@@ -124,6 +124,7 @@ namespace TornCityBot
             ThreadRandomWait(0.7, 1);
             map.FindElements(By.ClassName("torn-btn"))[1].Click();
             wait.Until(ExpectedConditions.ElementExists(By.Id("countrTravel")));
+            Thread.Sleep(1000);
             string travelTime = driver.FindElement(By.Id("countrTravel")).Text;
             DriverNavigate("https://www.google.com");
             Thread.Sleep(TimeSpan.Parse(travelTime) + TimeSpan.FromMinutes(1));
@@ -203,16 +204,7 @@ namespace TornCityBot
             {
                 WebElementInput(By.CssSelector("a[href*='/gym.php']"), null, null, () => ThreadRandomWait(1, 2));
                 //Complete captcha if there is one
-                try
-                {
-                    Thread.Sleep(7);
-                    driver.FindElement(By.Id("ui-id-3")).Click();
-                    ThreadRandomWait(1, 1.5);
-                    CaptchaSolver();
-                    ThreadRandomWait(1, 1.5);
-                    WebElementInput(By.XPath("//input[@name='reCaptcha']"), null, null, () => ThreadRandomWait(1, 1.5));
-                }
-                catch (Exception ex) { Console.WriteLine(ex.Message); }
+                CheckForCaptcha();
             }
 
             List<IWebElement> ul = driver.FindElements(By.TagName("ul")).ToList();
@@ -220,11 +212,6 @@ namespace TornCityBot
             string[] types = new string[] { "strength", "defense", "speed", "dexterity" };
 
             WebElementInput(By.TagName("input"), training[Array.IndexOf(types, stat)], amount.ToString(), () => ThreadRandomWait(1, 1.5));
-            //WebElementInput(By.TagName("button"), training[Array.IndexOf(types, stat)], null, () => ThreadRandomWait(1, 1.5));
-            /*training[Array.IndexOf(types, stat)].FindElement(By.TagName("input")).SendKeys(Keys.Control + "a");
-            ThreadRandomWait(0.5, 1);
-            training[Array.IndexOf(types, stat)].FindElement(By.TagName("input")).SendKeys(amount.ToString());
-            ThreadRandomWait(0.5, 1);*/
             training[Array.IndexOf(types, stat)].FindElements(By.TagName("button"))[2].Click();
             ThreadRandomWait(1, 1.5);
         }
@@ -239,23 +226,13 @@ namespace TornCityBot
                 ThreadRandomWait(1, 1.5);
 
                 //Complete captcha if there is one
-                try
-                {
-                    Thread.Sleep(5000);
-                    driver.FindElement(By.Id("ui-id-3")).Click();
-                    ThreadRandomWait(1, 1.5);
-                    CaptchaSolver();
-                    ThreadRandomWait(1, 1.5);
-
-                    WebElementInput(By.XPath("//input[@name='reCaptcha']"), null, null, () => ThreadRandomWait(1, 1.5));
-                }
-                catch (Exception ex) { Console.WriteLine(ex.Message); }
+                CheckForCaptcha();
             }
             ThreadRandomWait(1, 1.5);
             wait.Until(ExpectedConditions.ElementExists(By.XPath("//form[@name='crimes']")));
             driver.FindElement(By.XPath("//form[@name='crimes']")).FindElement(By.XPath($"//li[normalize-space() = '{crime}']")).FindElement(By.XPath("..//..")).Click();
 
-            double commitAmount = nerve / (TornActions.crimeList.Keys.ToList().IndexOf(crime) + 3);
+            double commitAmount = nerve / (crimeList.Keys.ToList().IndexOf(crime) + 3);
             int amount = (int)Math.Floor(commitAmount) - 1;
 
             ThreadRandomWait(1, 1.5);
@@ -288,9 +265,6 @@ namespace TornCityBot
             //Open the captcha
             driver.SwitchTo().Frame(iFrames[0]);
             WebElementInput(By.ClassName("recaptcha-checkbox-border"), null, null, () => ThreadRandomWait(2, 3));
-            /*driver.FindElement(By.ClassName("recaptcha-checkbox-border")).Click();
-            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(3);*/
-
 
             //Open audio captcha
             driver.SwitchTo().DefaultContent();
@@ -298,9 +272,6 @@ namespace TornCityBot
             driver.SwitchTo().Frame(iFrames[2]);
 
             WebElementInput(By.Id("recaptcha-audio-button"), null, null, () => ThreadRandomWait(2, 2.5));
-            /*driver.FindElement(By.Id("recaptcha-audio-button")).Click();
-            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(1.5);*/
-            //recaptcha-audio-button
 
             //Get link for audio and download it
             driver.SwitchTo().DefaultContent();
@@ -329,9 +300,6 @@ namespace TornCityBot
                 Console.WriteLine($"SpeechRec: Successful");
                 WebElementInput(By.Id("audio-response"), null, audioResponse, () => ThreadRandomWait(5, 7));
                 driver.FindElement(By.Id("audio-response")).SendKeys(Keys.Enter);
-                /*driver.FindElement(By.Id("audio-response")).SendKeys(audioResponse);
-                ThreadRandomWait(5, 7);
-                driver.FindElement(By.Id("audio-response")).SendKeys(Keys.Enter);*/
             }
             driver.SwitchTo().DefaultContent();
         }
