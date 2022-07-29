@@ -113,7 +113,7 @@ namespace TornCityBot
             //Apparent if class 't-red' is greater than 11, OC is about to start
             if (driver.Url != "https://www.torn.com/city.php")
             {
-                wait.Until(ExpectedConditions.ElementExists(By.CssSelector("a[href*='/city.php']")));
+                wait.Until(ExpectedConditions.ElementToBeClickable(By.CssSelector("a[href*='/city.php']")));
                 ThreadRandomWait(1, 2);
                 driver.FindElement(By.CssSelector("a[href*='/city.php']")).Click();
                 ThreadRandomWait(1, 1.5);
@@ -137,8 +137,9 @@ namespace TornCityBot
             map.FindElement(By.ClassName("torn-btn")).Click();
             ThreadRandomWait(0.7, 1);
             map.FindElements(By.ClassName("torn-btn"))[1].Click();
-            ThreadRandomWait(2, 3);
-            map.FindElements(By.ClassName("torn-btn"))[1].Click();
+            ThreadRandomWait(1, 2);
+            WebElementInput(By.ClassName("torn-btn"), map, null, () => ThreadRandomWait(2, 3));
+            //map.FindElements(By.ClassName("torn-btn"))[1].Click();
             wait.Until(ExpectedConditions.ElementExists(By.Id("countrTravel")));
             Thread.Sleep(10000);
             string travelTime = driver.FindElement(By.Id("countrTravel")).Text;
@@ -207,7 +208,8 @@ namespace TornCityBot
             //If user is not logged in
             if (driver.Url != "https://www.torn.com/index.php")
             {
-                driver.FindElement(By.Id("player")).SendKeys(username);
+                WebElementInput(By.Id("player"), null, username);
+                //driver.FindElement(By.Id("player")).SendKeys(username);
                 driver.FindElement(By.Id("password")).SendKeys(password);
                 ThreadRandomWait(7, 10);
                 driver.FindElement(By.Id("password")).SendKeys(Keys.Enter);
