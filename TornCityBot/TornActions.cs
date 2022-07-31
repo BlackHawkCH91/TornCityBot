@@ -23,6 +23,9 @@ namespace TornCityBot
         public static Dictionary<string, string[]> crimeList = new Dictionary<string, string[]>();
         static ChromeDriver driver;
         static WebDriverWait wait;
+
+        static int itemLimit;
+        static int itemCount;
         
         //Setup chromedriver and the wait
         public static void Init(ChromeDriver _driver, WebDriverWait _wait)
@@ -81,6 +84,19 @@ namespace TornCityBot
             {
                 threadRandomWait();
             }
+        }
+
+        public static void ItemCount()
+        {
+            LogIn("christian.hensman1@gmail.com", "romeo007");
+            ThreadRandomWait(2, 3);
+            wait.Until(ExpectedConditions.ElementExists(By.ClassName("delimiter")));
+            List<IWebElement> info = driver.FindElements(By.ClassName("delimiter"))[1].FindElements(By.TagName("span")).ToList();
+
+            itemCount = int.Parse(info[2].Text);
+            itemLimit = int.Parse(info[3].Text);
+
+            Console.WriteLine($"{itemCount}, {itemLimit}");
         }
 
         public static void CheckForCaptcha()
