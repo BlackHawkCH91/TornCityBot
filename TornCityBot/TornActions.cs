@@ -137,9 +137,10 @@ namespace TornCityBot
             map.FindElement(By.ClassName("torn-btn")).Click();
             ThreadRandomWait(0.7, 1);
             map.FindElements(By.ClassName("torn-btn"))[1].Click();
-            ThreadRandomWait(1, 2);
-            WebElementInput(By.ClassName("torn-btn"), map, null, () => ThreadRandomWait(2, 3));
-            //map.FindElements(By.ClassName("torn-btn"))[1].Click();
+            //ThreadRandomWait(1, 2);
+            Thread.Sleep(15000);
+            //WebElementInput(By.ClassName("torn-btn"), map, null, () => ThreadRandomWait(2, 3));
+            map.FindElements(By.ClassName("torn-btn"))[1].Click();
             wait.Until(ExpectedConditions.ElementExists(By.Id("countrTravel")));
             Thread.Sleep(10000);
             string travelTime = driver.FindElement(By.Id("countrTravel")).Text;
