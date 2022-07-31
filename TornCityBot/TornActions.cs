@@ -15,6 +15,7 @@ using System.Text.Json;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using SeleniumExtras.WaitHelpers;
+using OpenQA.Selenium.Interactions;
 
 namespace TornCityBot
 {
@@ -23,6 +24,7 @@ namespace TornCityBot
         public static Dictionary<string, string[]> crimeList = new Dictionary<string, string[]>();
         static ChromeDriver driver;
         static WebDriverWait wait;
+        static IJavaScriptExecutor JsDriver;
 
         static int itemLimit;
         static int itemCount;
@@ -32,6 +34,7 @@ namespace TornCityBot
         {
             driver = _driver ?? throw new ArgumentNullException(nameof(driver));
             wait = _wait ?? throw new ArgumentNullException(nameof(wait));
+            JsDriver = (IJavaScriptExecutor)driver;
 
             //Sorry for spaghet. Complete list of all crimes for future gui.
             crimeList.Add("Search for Cash", new string[] { "Search the Train Station", "Search Under the Old Bridge", "Search the Bins", "Search the Water Fountain", "Search the Dumpsters", "Search the Movie Theater" });
@@ -165,6 +168,9 @@ namespace TornCityBot
             //countrTravel
         }
 
+
+        //Convert this to list/dictionary to try and buy other items if one is not available.
+        //Use ItemCount to ensure player is full before leaving.
         public static void BuyAbroad(string item, int amount)
         {
             LogIn("christian.hensman1@gmail.com", "romeo007");
@@ -267,7 +273,13 @@ namespace TornCityBot
             }
             ThreadRandomWait(1, 1.5);
             wait.Until(ExpectedConditions.ElementExists(By.XPath("//form[@name='crimes']")));
-            driver.FindElement(By.XPath("//form[@name='crimes']")).FindElement(By.XPath($"//li[normalize-space() = '{crime}']")).FindElement(By.XPath("..//..")).Click();
+            IWebElement mainCrime = driver.FindElement(By.XPath("//form[@name='crimes']")).FindElement(By.XPath($"//li[normalize-space() = '{crime}']")).FindElement(By.XPath("..//.."));
+            if (crimeList.Keys.ToList().IndexOf(crime) > 9)
+            {
+                JsDriver.ExecuteScript("scrollBy(0, 2000)");
+            }
+            ThreadRandomWait(0.5, 0.75);
+            mainCrime.Click();
 
             double commitAmount = nerve / (crimeList.Keys.ToList().IndexOf(crime) + 3);
             int amount = (int)Math.Floor(commitAmount) - 1;

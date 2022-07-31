@@ -1,5 +1,4 @@
-﻿#pragma warning disable CS8622 // Nullability of reference types in type of parameter doesn't match the target delegate (possibly because of nullability attributes).
-//Libraries
+﻿//Libraries
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
@@ -17,11 +16,11 @@ using TornActions = TornCityBot.TornActions;
 bool headless = false;
 Vosk.Vosk.SetLogLevel(-1);
 
-//icon15-sidebar <- hospital
+//id=icon15-sidebar <- hospital
 //Getting info:
 
 /*
-ToolTipPortal
+class=ToolTipPortal
     Div
         Div[2] (second div)
             p[2] (second para)
@@ -81,8 +80,6 @@ if (headless)
     driver.ExecuteCdpCommand("Page.addScriptToEvaluateOnNewDocument", cmdParams);
 }
 
-IJavaScriptExecutor loadChrome = (IJavaScriptExecutor)driver;
-
 TornActions.Init(driver, wait);
 
 //driver.Navigate().GoToUrl("https://intoli.com/blog/not-possible-to-block-chrome-headless/chrome-headless-test.html");
@@ -90,10 +87,10 @@ TornActions.Init(driver, wait);
 //string thing = driver.FindElement(By.TagName("table")).GetAttribute("innerHTML");
 //Console.WriteLine(thing);
 
-TornActions.ItemCount();
-//TornActions.LogIn("christian.hensman1@gmail.com", "romeo007");
-//TornActions.GymTrain("defense", 200);
-//TornActions.Crimes("Grand Theft Auto", "Steal a Parked Car", 46);
+//TornActions.ItemCount();
+TornActions.LogIn("christian.hensman1@gmail.com", "romeo007");
+TornActions.GymTrain("defense", 200);
+TornActions.Crimes("Grand Theft Auto", "Steal a Parked Car", 46);
 //TornActions.Fly("airstrip", "china");
 //TornActions.BuyAbroad("Panda Plushie", 44);
 
@@ -101,3 +98,12 @@ TornActions.ItemCount();
 
 Console.ReadLine();
 
+/*TODO:
+
+Change argument of BuyAbroad to a list/dictionary to buy other items in case one is missing. Wait if all items are missing
+Make a JSON file
+Can't wait to make a GUI.
+
+
+
+*/
