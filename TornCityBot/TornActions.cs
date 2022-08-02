@@ -171,44 +171,67 @@ namespace TornCityBot
 
         //Convert this to list/dictionary to try and buy other items if one is not available.
         //Use ItemCount to ensure player is full before leaving.
-        public static void BuyAbroad(string item, int amount)
+        public static void BuyAbroad(Dictionary<string, int> items)
         {
             LogIn("christian.hensman1@gmail.com", "romeo007");
             //Complete captcha if there is one
             CheckForCaptcha();
 
             IWebElement shop = driver.FindElement(By.CssSelector("ul[role*='tablist']"));
-            bool itemExists = false;
             IWebElement child = null;
 
-            while (!itemExists)
+
+            while (true)
             {
-                try
+                foreach(KeyValuePair<string, int> item in items)
                 {
-                    //aria-label="Buy: {item}"
-                    //child = driver.FindElement(By.XPath($"(//*[contains(., '{item}')])"));
-                    child = driver.FindElement(By.CssSelector($"a[aria-label*='Buy: {item}']"));
-                    itemExists = true;
-                } catch {
+                    ItemCount();
+
+                    if (itemCount == itemLimit)
+                    {
+                        break;
+                    }
+
+                    try
+                    {
+                        //aria-label="Buy: {item}"
+                        //child = driver.FindElement(By.XPath($"(//*[contains(., '{item}')])"));
+                        child = driver.FindElement(By.CssSelector($"a[aria-label*='Buy: {item.Key}']"));
+                        //IWebElement buyAmount = child.FindElement(By.ClassName("deal"));
+                        IWebElement buyAmount = child.FindElement(By.XPath(".."));
+
+                        buyAmount.FindElement(By.TagName("input")).SendKeys(Keys.Control + "a");
+                        buyAmount.FindElement(By.TagName("input")).SendKeys(item.Value.ToString());
+                        ThreadRandomWait(1, 1.5);
+                        buyAmount.FindElement(By.TagName("a")).Click();
+                        ThreadRandomWait(1, 1.5);
+                        //wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//button[. = 'BUY']")));
+                        //buyAmount.FindElement(By.XPath("//button[. = 'BUY']")).Click();
+                        driver.FindElement(By.ClassName("expanded")).FindElement(By.ClassName("torn-btn")).Click();
+                        ThreadRandomWait(3, 4);
+
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+                }
+
+                ItemCount();
+
+                if (itemCount == itemLimit)
+                {
+                    break;
+                } else
+                {
                     DriverNavigate("https://www.google.com");
                     Thread.Sleep(900000);
                     LogIn("christian.hensman1@gmail.com", "romeo007");
                 }
             }
+            
 
-            //IWebElement buyAmount = child.FindElement(By.ClassName("deal"));
-            IWebElement buyAmount = child.FindElement(By.XPath(".."));
-
-            buyAmount.FindElement(By.TagName("input")).SendKeys(Keys.Control + "a");
-            buyAmount.FindElement(By.TagName("input")).SendKeys(amount.ToString());
-            ThreadRandomWait(1, 1.5);
-            buyAmount.FindElement(By.TagName("a")).Click();
-            ThreadRandomWait(1, 1.5);
-
-            //wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//button[. = 'BUY']")));
-            //buyAmount.FindElement(By.XPath("//button[. = 'BUY']")).Click();
-            driver.FindElement(By.ClassName("expanded")).FindElement(By.ClassName("torn-btn")).Click();
-            ThreadRandomWait(3, 4);
+            //Travel back home
             driver.FindElement(By.ClassName("travel-home")).Click();
             ThreadRandomWait(1, 1.5);
             driver.FindElement(By.XPath("//button[. = 'TRAVEL BACK']")).Click();

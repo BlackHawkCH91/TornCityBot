@@ -88,11 +88,15 @@ TornActions.Init(driver, wait);
 //Console.WriteLine(thing);
 
 //TornActions.ItemCount();
-TornActions.LogIn("christian.hensman1@gmail.com", "romeo007");
-TornActions.GymTrain("defense", 200);
-TornActions.Crimes("Grand Theft Auto", "Steal a Parked Car", 46);
+//TornActions.LogIn("christian.hensman1@gmail.com", "romeo007");
+//TornActions.GymTrain("defense", 200);
+//TornActions.Crimes("Grand Theft Auto", "Steal a Parked Car", 46);
 //TornActions.Fly("airstrip", "china");
-//TornActions.BuyAbroad("Panda Plushie", 44);
+
+Dictionary<string, int> items = new Dictionary<string, int>();
+items.Add("Panda Plushie", 44);
+items.Add("Peony", 44);
+TornActions.BuyAbroad(items);
 
 //CaptchaSolver();
 
