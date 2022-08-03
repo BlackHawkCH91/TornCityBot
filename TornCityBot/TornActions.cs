@@ -25,6 +25,7 @@ namespace TornCityBot
         static ChromeDriver driver;
         static WebDriverWait wait;
         static IJavaScriptExecutor JsDriver;
+        static Actions action;
 
         static int itemLimit;
         static int itemCount;
@@ -35,6 +36,7 @@ namespace TornCityBot
             driver = _driver ?? throw new ArgumentNullException(nameof(driver));
             wait = _wait ?? throw new ArgumentNullException(nameof(wait));
             JsDriver = (IJavaScriptExecutor)driver;
+             action = new Actions(driver);
 
             //Sorry for spaghet. Complete list of all crimes for future gui.
             crimeList.Add("Search for Cash", new string[] { "Search the Train Station", "Search Under the Old Bridge", "Search the Bins", "Search the Water Fountain", "Search the Dumpsters", "Search the Movie Theater" });
@@ -89,9 +91,26 @@ namespace TornCityBot
             }
         }
 
+        public static void GetPlayerStatis()
+        {
+            //id=icon15-sidebar <- hospital
+            //Getting info:
+
+            /*
+            class=ToolTipPortal
+                Div
+                    Div[2] (second div)
+                        p[2] (second para)
+
+            */
+            wait.Until(ExpectedConditions.ElementExists(By.Id("icon15-sidebar")));
+            action.MoveToElement(driver.FindElement(By.Id("icon15-sidebar"))).Perform();
+            string hospTime = driver.FindElement(By.ClassName("ToolTipPortal")).FindElement(By.XPath("./div/div[2]/p[2]")).Text;
+        }
+
         public static void ItemCount()
         {
-            LogIn("christian.hensman1@gmail.com", "romeo007");
+            //LogIn("christian.hensman1@gmail.com", "romeo007");
             ThreadRandomWait(2, 3);
             wait.Until(ExpectedConditions.ElementExists(By.ClassName("delimiter")));
             List<IWebElement> info = driver.FindElements(By.ClassName("delimiter"))[1].FindElements(By.TagName("span")).ToList();
@@ -185,12 +204,7 @@ namespace TornCityBot
             {
                 foreach(KeyValuePair<string, int> item in items)
                 {
-                    ItemCount();
-
-                    if (itemCount == itemLimit)
-                    {
-                        break;
-                    }
+                    bool boughtItem = false;
 
                     try
                     {
@@ -209,11 +223,24 @@ namespace TornCityBot
                         //buyAmount.FindElement(By.XPath("//button[. = 'BUY']")).Click();
                         driver.FindElement(By.ClassName("expanded")).FindElement(By.ClassName("torn-btn")).Click();
                         ThreadRandomWait(3, 4);
-
+                        ItemCount();
+                        boughtItem = true;
                     }
                     catch
                     {
                         continue;
+                    }
+
+                    if (itemCount == itemLimit)
+                    {
+                        break;
+                    } else
+                    {
+                        if (boughtItem)
+                        {
+                            driver.Navigate().Refresh();
+                            ThreadRandomWait(1, 2);
+                        }
                     }
                 }
 

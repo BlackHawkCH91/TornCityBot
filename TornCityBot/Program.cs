@@ -16,16 +16,7 @@ using TornActions = TornCityBot.TornActions;
 bool headless = false;
 Vosk.Vosk.SetLogLevel(-1);
 
-//id=icon15-sidebar <- hospital
-//Getting info:
 
-/*
-class=ToolTipPortal
-    Div
-        Div[2] (second div)
-            p[2] (second para)
-
-*/
 
 //Console.WriteLine(SpeechRec());
 
